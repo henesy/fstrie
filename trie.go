@@ -1,4 +1,4 @@
-// Package fstrie provides a trie interface that is string-addressed and unsorted.
+// Package fstrie provides a trie data structure that is string-addressed and unsorted.
 // Nodes are singly-linked and do not reference their parents and data storage is an interface{}.
 // fstrie has a fairly strict syntax which is remniscient of file paths in a traditional unix-like operating system. 
 // In general, fstrie expects correctly formatted paths, though it handles non-existent nodes.
