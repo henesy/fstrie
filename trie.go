@@ -6,20 +6,21 @@ import (
 
 // Node for trie
 type Node struct {
-	key		string
-	data	interface{}
-	next	*Node
-	down	*Node
+	Key		string
+	Data	interface{}
+	Next	*Node
+	Down	*Node
 }
 
 // Tree for trie
 type Trie struct {
-	root	*Node
+	Root	*Node
 }
+
 
 /* Create a new trie */
 func New() (t Trie) {
-	t.root = nil
+	t.Root = nil
 	return
 }
 
