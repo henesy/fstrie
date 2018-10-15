@@ -1,3 +1,9 @@
+/*
+Package fstrie provides a trie interface that is string-addressed and unsorted.
+Nodes are singly-linked and do not reference their parents and data storage is an interface{}.
+fstrie has a fairly strict syntax which is remniscient of file paths in a traditional unix-like operating system. 
+In general, fstrie expects correctly formatted paths, though it handles non-existent nodes. 
+*/
 package fstrie
 
 import (
@@ -14,13 +20,13 @@ type Node struct {
 	Down	*Node
 }
 
-// Tree for trie
+// Trie tree container
 type Trie struct {
 	Root	*Node
 }
 
 
-// Create a new trie
+// New creates an initialized Trie
 func New() (t Trie) {
 	n := new(Node)
 	n.Next = nil
@@ -134,7 +140,7 @@ func (t *Trie) String() {
 	
 }
 
-// Return the set of top-level children for a Node
+// Children returns the set of top-level children for a Node
 func (n *Node) Children() []*Node {
 	var children []*Node
 	cursor := n.Down
@@ -150,7 +156,7 @@ func (n *Node) Children() []*Node {
 	return children
 }
 
-// Find the existent portion of a path
+// Existent portion of a path is extracted and returned
 func (t *Trie) Existent(keyPath string) string {
 	if keyPath == "/" {
 		return keyPath
@@ -173,7 +179,7 @@ func (t *Trie) Existent(keyPath string) string {
 	return realPath
 }
 
-// Remove then re-Add a node into a different location ;; will overwrite existing name `to`
+// Mv Removes then re-Adds a node into a different location ;; will overwrite existing name `to`
 func (t *Trie) Mv(from, to string) (*Node, error) {
 	if from == "/" || to == "/" {
 		// Not allowed to change "/"
