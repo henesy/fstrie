@@ -156,10 +156,19 @@ func (n *Node) Children() []*Node {
 
 // Walks until it finds the parent of an element ;; Returns {parent, child}
 func (t *Trie) getParent(path *[]string, key *string) (*Node, *Node) {
-	p, ok := t.Find((*path)[len(*path)-2])
-	if !ok {
-		// If there's no parent, there's no parent
-		return nil, nil
+	var p *Node
+	if len(*path) == 1 {
+		// Base node
+		p = t.Root
+	} else {
+		// Spook
+		parentPath := mkPath((*path)[:len(*path)-1])
+		parent, ok := t.Find(parentPath)
+		if !ok {
+			// If there's no parent, there's no parent
+			return nil, nil
+		}
+		p = parent
 	}
 
 	c := p.getChild(*key)
