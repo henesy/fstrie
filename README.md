@@ -1,3 +1,5 @@
+[![GoDoc](https://godoc.org/github.com/henesy/fstrie?status.svg)](https://godoc.org/github.com/henesy/fstrie)
+
 # fstrie
 
 fstrie is a string-indexed trie to represent a file system.
