@@ -65,7 +65,7 @@ func (t *Trie) Add(keyPath string, data interface{}) *Node {
 	return n
 }
 
-// Remove a node (by Find) ;; Returns true if removed
+// Remove a node (by Find) ;; Returns removed node's Data
 func (t *Trie) Remove(keyPath string) interface{} {
 	if keyPath == "/" {
 		// Not allowed to delete root
@@ -133,7 +133,7 @@ func (t *Trie) Find(keyPath string) (*Node) {
 	return nil
 }
 
-// Return a string version of the trie -- du -a
+// Return a string version of the trie in the style of tree(1)
 func (t *Trie) String() (out string) {
 	out += ""
 	indent := 0
@@ -141,7 +141,7 @@ func (t *Trie) String() (out string) {
 	return
 }
 
-// Children returns the set of top-level children for a Node
+// Children returns the set of top-level children for a node
 func (n *Node) Children() []*Node {
 	var children []*Node
 	cursor := n.Down
@@ -180,7 +180,7 @@ func (t *Trie) Existent(keyPath string) string {
 	return realPath
 }
 
-// Mv Removes then re-Adds a node into a different location ;; will overwrite existing name `to`
+// Mv Removes then re-Adds a node into a different location ;; will overwrite existing name 'to'
 func (t *Trie) Mv(from, to string) (*Node, error) {
 	if from == "/" || to == "/" {
 		// Not allowed to change "/"
@@ -213,7 +213,7 @@ func (t *Trie) Mv(from, to string) (*Node, error) {
 
 /* Unexported */
 
-// Make the string representation of a Node
+// Build the string representation of a Node
 func (n *Node) string(out *string, indent int) {
 	// Set our key
 	*out += n.Key + "\n"

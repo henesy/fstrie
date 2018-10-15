@@ -34,7 +34,7 @@ Get all children of a node:
 
 	nodes := node.Children()
 
-Find the most complete path to a file:
+Find the most complete path to a node:
 
 	path := t.Existent("/tmp/data/newt")
 
