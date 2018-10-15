@@ -118,6 +118,7 @@ func (t *Trie) Find(keyPath string) (*Node) {
 	for i := 0; i < len(path)+1; i++ {
 		if cursor.Key == key && i == len(path) {
 			// Last element is our file, if exists
+			fmt.Println("i: ", i)
 			return cursor
 		}
 		cursor = cursor.getChild(path[i])
@@ -223,9 +224,12 @@ func (t *Trie) addNode(keyPath string, n *Node) *Node {
 	}
 	
 	// Insert after p
-	n.Next = p.Down
+	if n != p.Down {
+		// If we are not already the first down
+		n.Next = p.Down
+		p.Down = n
+	}
 	n.Key = key
-	p.Down = n
 	return n
 }
 

@@ -102,3 +102,22 @@ func TestExistent(test *testing.T) {
 		test.Errorf("Expected c to not exist and a to exist, got: %v, %v", cPath, aPath)
 	}
 }
+
+// Test moving
+func TestMv(test *testing.T) {
+	t := New()
+	t.Add("/tmp", 5)
+	t.Add("/tmp/dir", 22)
+	a, b := 24, 11
+	t.Add("/tmp/dir/a", a)
+	t.Add("/tmp/dir/b", b)
+	
+	dir2, err := t.Mv("/tmp/dir", "/tmp/dir2")
+	aN := t.Find("/tmp/dir2/a")
+	bN := t.Find("/tmp/dir2/b")
+	dir := t.Find("/tmp/dir") // Causes infinite loop
+	
+	if 	t.Find("/tmp/dir2").Key != "dir2" || aN.Data != a || bN.Data != b || err != nil || dir != nil {
+		test.Errorf("Expected dir to be moved with children, got: %v with %v %v from ", dir2, aN, bN)
+	}
+}
