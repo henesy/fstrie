@@ -231,7 +231,7 @@ func (n *Node) string(out *string, indent int) {
 		lead += "─"
 		
 		for i := 0; i < indent; i++ {
-			*out += "   "
+			*out += "│ "
 		}
 		*out += lead
 		v.string(out, indent+1)
