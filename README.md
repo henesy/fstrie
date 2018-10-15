@@ -44,6 +44,11 @@ Print a string representation of the trie:
 
 	fmt.Println(t.String())
 
+## Testing
+
+	go test
+
 ## References
 
-- Ryan
+- @RyanRadomski7
+

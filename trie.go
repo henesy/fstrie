@@ -186,6 +186,10 @@ func (t *Trie) Mv(from, to string) (*Node, error) {
 		return nil, fmt.Errorf("Node %v not found.", from)
 	}
 
+	if from == to {
+		return n, nil
+	}
+
 	// Maybe this should be its own fn
 	parentPath := mkPath(tPath[:len(tPath)-1])
 	if t.Find(parentPath) == nil {
