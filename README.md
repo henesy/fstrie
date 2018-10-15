@@ -46,6 +46,23 @@ Print a string representation of the trie:
 
 	fmt.Println(t.String())
 
+## Demo
+
+The example file `examples/build.go` shows the construction of a basic fstrie and outputs:
+
+	/
+	├─abc
+	├─num
+	│ ├─c
+	│ │ ├─curly
+	│ │ │ ├─tow
+	│ │ │ └─puppy
+	│ │ └─quote
+	│ ├─b
+	│ │ └─king
+	│ └─a
+	└─tmp
+
 ## Testing
 
 	go test

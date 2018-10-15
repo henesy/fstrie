@@ -1,7 +1,7 @@
 package main
 
 import (
-		"fmt"
+	"fmt"
 trie	"github.com/henesy/fstrie"
 )
 
