@@ -12,3 +12,12 @@ func TestNew(test *testing.T) {
 }
 
 
+func TestAdd(test *testing.T) {
+	t := New()
+	num := 5
+	usr := t.Add("/usr", num)
+	if t.Root.Down.Key != "usr" {
+		test.Errorf("Expected usr as down of root, got: %v is %v", t.Root.Down, usr)
+	}
+}
+

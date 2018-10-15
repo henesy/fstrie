@@ -30,57 +30,78 @@ func New() (t Trie) {
 	return
 }
 
-// Add a new node, all controls whether `mkdir -p` behaviour ;; Returns added node
-func (t *Trie) Add(keyPath string, data interface{}, all bool) *Node {
+// Add a new node ;; Returns added node
+func (t *Trie) Add(keyPath string, data interface{}) *Node {
 	if keyPath == "/" {
 		// Root is eternal
 		return nil
 	}
-	//path, key := mkPath(keyPath)
-	_, key := mkPath(keyPath)
-	p, ok := t.Find(keyPath)
+	path, key := getPath(keyPath)
+
+	// Returns parent if !ok
+	var parentPath string
+	if len(path) < 2 {
+		parentPath = "/"
+	} else {
+		parentPath = mkPath(path[:len(path)-2])
+	}
+	p, ok := t.Find(parentPath)
 	if !ok {
-		if all {
-			// Make all files in path if don't exist
-			
-		} else {
-			// No parent to add from
-			return nil
-		}
+		// No parent to add from
+		return nil
 	}
 	
 	// Insert after p
-	// TODO -- this does not account for Down… this is wrong.
-	tmp := p.Next
 	n := new(Node)
-	n.Next = tmp
+	n.Next = p.Down
 	n.Down = nil
 	n.Key = key
 	n.Data = data
-	p.Next = n
+	p.Down = n
 	return n
 }
 
 // Remove a node (by Find) ;; Returns true if removed
-func (t *Trie) Remove(keyPath string) bool {
+func (t *Trie) Remove(keyPath string) interface{} {
 	if keyPath == "/" {
 		// Not allowed to delete root
-		return false
+		return nil
 	}
-	path, key := mkPath(keyPath)
-	// Get the parent
-	p, c := t.getParent(&path, &key)
+	path, key := getPath(keyPath)
+
+	p, _ := t.getParent(&path, &key)
 	if p == nil {
-		return false
+		// Parent does not exist, no such file
+		return nil
 	}
 	
-	// When we delete a file, if it's a dir, its children are lost; preserve continuity
-	// TODO -- this doesn't account for Down... ; this is wrong
-	tmp := p.Next
-	p.Next = c.Next
-	c.Next = tmp
+	// When we delete a file, if it's a dir, its children are lost; preserve continuity	
+	cursor := p.Down.Next
+	last := p.Down
+	
+	if last.Key == key {
+		// First child node
+		tmp := p.Down
+		p.Down = p.Down.Next
+		return tmp.Data
+	}
+	
+	for {
+		if cursor == nil {
+			// This should never happen
+			return nil
+		}
+		if cursor.Key == key {
+			// Remove this node
+			tmp := cursor
+			last.Next = cursor.Next
+			return tmp.Data
+		}
+		last = cursor
+		cursor = cursor.Next
+	}
 
-	return true
+	return nil
 }
 
 // Find a node by string index ;; Returns {found node, true} or {last found node, false}
@@ -88,7 +109,7 @@ func (t *Trie) Find(keyPath string) (*Node, bool) {
 	if keyPath == "/" {
 		return t.Root, true
 	}
-	path, key := mkPath(keyPath)
+	path, key := getPath(keyPath)
 	if t.Root == nil {
 		return nil, false
 	}
@@ -151,10 +172,19 @@ func (n *Node) getChild(key string) *Node {
 	}
 }
 
-// Utility for code reuse
-func mkPath(keyPath string) (path []string, key string) {
+// Utility to extract path and key from keyPath
+func getPath(keyPath string) (path []string, key string) {
 	// Due to how split works, if we make a path with a leading /, strip 0th
 	path = strings.Split(keyPath, "/")[1:]
 	key = path[len(path)-1]
 	return
+}
+
+// Utility to generate path strings -- slow
+func mkPath(path []string) string {
+	keyPath := ""
+	for _, v := range path {
+		keyPath += "/" + v
+	}
+	return keyPath
 }
