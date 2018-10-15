@@ -68,3 +68,37 @@ func TestRemoveMany(test *testing.T) {
 	}
 }
 
+// Test single Find
+func TestFind(test *testing.T) {
+	t := New()
+	t.Add("/tmp", 4)
+	t.Add("/tmp/dir", 8)
+	a, b := 9, 21
+	t.Add("/tmp/dir/a", a)
+	t.Add("/tmp/dir/b", b)
+	
+	aN := t.Find("/tmp/dir/a")
+	bN := t.Find("/tmp/dir/b")
+	cN := t.Find("/tmp/dir/c")
+	
+	if cN != nil || aN.Data != a || bN.Data != b {
+		test.Errorf("Expected to find a, b and not c, got: %v, %v, %v", aN, bN, cN)
+	}
+}
+
+// Test existent path
+func TestExistent(test *testing.T) {
+	t := New()
+	t.Add("/tmp", 4)
+	t.Add("/tmp/dir", 8)
+	a, b := 9, 21
+	t.Add("/tmp/dir/a", a)
+	t.Add("/tmp/dir/b", b)
+
+	cPath := t.Existent("/tmp/dir/c")
+	aPath := t.Existent("/tmp/dir/a")
+	
+	if cPath != "/tmp/dir" || aPath != "/tmp/dir/a" {
+		test.Errorf("Expected c to not exist and a to exist, got: %v, %v", cPath, aPath)
+	}
+}

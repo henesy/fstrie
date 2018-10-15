@@ -1,5 +1,4 @@
 # fstrie
-Filesystem style trie data structure.
 
 fstrie is a string-indexed trie to represent a file system.
 
@@ -33,7 +32,14 @@ Get all children of a node:
 
 	nodes := node.Children()
 
+Find the most complete path to a file:
+
+	path := t.Existent("/tmp/data/newt")
+
+Print a string representation of the trie:
+
+	fmt.Println(t.String())
+
 ## References
 
 - Ryan
-

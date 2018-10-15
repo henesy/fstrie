@@ -38,15 +38,14 @@ func (t *Trie) Add(keyPath string, data interface{}) *Node {
 	}
 	path, key := getPath(keyPath)
 
-	// Returns parent if !ok
 	var parentPath string
 	if len(path) < 2 {
 		parentPath = "/"
 	} else {
 		parentPath = mkPath(path[:len(path)-1])
 	}
-	p, ok := t.Find(parentPath)
-	if !ok {
+	p := t.Find(parentPath)
+	if p == nil {
 		// No parent to add from
 		return nil
 	}
@@ -105,30 +104,28 @@ func (t *Trie) Remove(keyPath string) interface{} {
 }
 
 // Find a node by string index ;; Returns {found node, true} or {last found node, false}
-func (t *Trie) Find(keyPath string) (*Node, bool) {
+func (t *Trie) Find(keyPath string) (*Node) {
 	if keyPath == "/" {
-		return t.Root, true
+		return t.Root
 	}
 	path, key := getPath(keyPath)
 	if t.Root == nil {
-		return nil, false
+		return nil
 	}
 	cursor := t.Root
-	last := cursor
 
 	for i := 0; i < len(path)+1; i++ {
 		if cursor.Key == key && i == len(path) {
 			// Last element is our file, if exists
-			return cursor, true
+			return cursor
 		}
-		last = cursor
 		cursor = cursor.getChild(path[i])
 		if cursor == nil {
 			// There are no more paths to walk
 			break
 		}
 	}
-	return last, false
+	return nil
 }
 
 // Return a string version of the trie -- du -a
@@ -152,7 +149,30 @@ func (n *Node) Children() []*Node {
 	return children
 }
 
-// Unexported
+// Find the existent portion of a path
+func (t *Trie) Existent(keyPath string) string {
+	if keyPath == "/" {
+		return keyPath
+	}
+	path, _ := getPath(keyPath)
+	if t.Root == nil {
+		return ""
+	}
+	cursor := t.Root
+	realPath := ""
+
+	for i := 0; i < len(path); i++ {
+		cursor = cursor.getChild(path[i])
+		if cursor == nil {
+			// There are no more paths to walk
+			break
+		}
+		realPath += "/" + cursor.Key
+	}
+	return realPath
+}
+
+/* Unexported */
 
 // Walks until it finds the parent of an element ;; Returns {parent, child}
 func (t *Trie) getParent(path *[]string, key *string) (*Node, *Node) {
@@ -163,8 +183,8 @@ func (t *Trie) getParent(path *[]string, key *string) (*Node, *Node) {
 	} else {
 		// Spook
 		parentPath := mkPath((*path)[:len(*path)-1])
-		parent, ok := t.Find(parentPath)
-		if !ok {
+		parent := t.Find(parentPath)
+		if parent == nil {
 			// If there's no parent, there's no parent
 			return nil, nil
 		}
