@@ -118,6 +118,6 @@ func TestMv(test *testing.T) {
 	dir := t.Find("/tmp/dir") // Causes infinite loop
 	
 	if 	t.Find("/tmp/dir2").Key != "dir2" || aN.Data != a || bN.Data != b || err != nil || dir != nil {
-		test.Errorf("Expected dir to be moved with children, got: %v with %v %v from ", dir2, aN, bN)
+		test.Errorf("Expected dir to be moved with children, got: %v with %v %v from %v", dir2, aN, bN, dir)
 	}
 }
