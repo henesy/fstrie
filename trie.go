@@ -2,6 +2,7 @@ package fstrie
 
 import (
 	"strings"
+	"fmt"
 )
 
 
@@ -172,7 +173,61 @@ func (t *Trie) Existent(keyPath string) string {
 	return realPath
 }
 
+// Remove then re-Add a node into a different location ;; will overwrite existing name `to`
+func (t *Trie) Mv(from, to string) (*Node, error) {
+	if from == "/" || to == "/" {
+		// Not allowed to change "/"
+		return nil, fmt.Errorf("Root is immutable.")
+	}
+
+	tPath, tKey := getPath(to)
+	n := t.Find(from)
+	if n == nil {
+		return nil, fmt.Errorf("Node %v not found.", from)
+	}
+
+	// Maybe this should be its own fn
+	parentPath := mkPath(tPath[:len(tPath)-1])
+	if t.Find(parentPath) == nil {
+		// Parent does not exist
+		return nil, fmt.Errorf("Parent node %v not found.", parentPath)
+	}
+	
+	n.Key = tKey
+	t.Remove(from)
+	t.addNode(to, n)
+	
+	return n, nil
+}
+
 /* Unexported */
+
+// Adds an existing node to the trie -- modifies Key and Next
+func (t *Trie) addNode(keyPath string, n *Node) *Node {
+	if keyPath == "/" {
+		// Root is eternal
+		return nil
+	}
+	path, key := getPath(keyPath)
+
+	var parentPath string
+	if len(path) < 2 {
+		parentPath = "/"
+	} else {
+		parentPath = mkPath(path[:len(path)-1])
+	}
+	p := t.Find(parentPath)
+	if p == nil {
+		// No parent to add from
+		return nil
+	}
+	
+	// Insert after p
+	n.Next = p.Down
+	n.Key = key
+	p.Down = n
+	return n
+}
 
 // Walks until it finds the parent of an element ;; Returns {parent, child}
 func (t *Trie) getParent(path *[]string, key *string) (*Node, *Node) {

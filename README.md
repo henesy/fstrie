@@ -36,6 +36,10 @@ Find the most complete path to a file:
 
 	path := t.Existent("/tmp/data/newt")
 
+Move (and/or rename) a node:
+
+	node, err := t.Mv("/tmp/a", "/tmp/b")
+
 Print a string representation of the trie:
 
 	fmt.Println(t.String())
