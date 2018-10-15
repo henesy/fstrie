@@ -108,7 +108,7 @@ func (t *Trie) Remove(keyPath string) interface{} {
 	return nil
 }
 
-// Find a node by string index ;; Returns {found node, true} or {last found node, false}
+// Find a node by string index ;; Returns the found node or nil
 func (t *Trie) Find(keyPath string) (*Node) {
 	if keyPath == "/" {
 		return t.Root
