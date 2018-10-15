@@ -2,7 +2,6 @@ package fstrie
 
 import (
 	"testing"
-	"fmt"
 )
 
 
@@ -140,6 +139,24 @@ func TestString(test *testing.T) {
 	t.Add("/num/b/king", "sword")
 	t.Add("/abc", 0x321)
 
-	fmt.Println(t.String())
+	str := `/
+├─abc
+├─num
+│ ├─c
+│ │ ├─curly
+│ │ │ ├─tow
+│ │ │ └─puppy
+│ │ └─quote
+│ ├─b
+│ │ └─king
+│ └─a
+└─tmp
+`
+
+	out := t.String()
+
+	if out != str {
+		test.Errorf("Expected valid tree string, got: %v", out)
+	}
 }
 
