@@ -6,8 +6,8 @@ import (
 
 func TestNew(test *testing.T) {
 	t := New()
-	if t.Root != nil {
-		test.Errorf("Expected nil, got: %v", t.Root)
+	if t.Root.Key != "/" || t.Root.Next != nil || t.Root.Down != nil || t.Root.Data != nil {
+		test.Errorf("Expected root, got: %v", t.Root)
 	}
 }
 
