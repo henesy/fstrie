@@ -118,7 +118,6 @@ func (t *Trie) Find(keyPath string) (*Node) {
 	for i := 0; i < len(path)+1; i++ {
 		if cursor.Key == key && i == len(path) {
 			// Last element is our file, if exists
-			fmt.Println("i: ", i)
 			return cursor
 		}
 		cursor = cursor.getChild(path[i])
