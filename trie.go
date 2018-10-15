@@ -134,8 +134,11 @@ func (t *Trie) Find(keyPath string) (*Node) {
 }
 
 // Return a string version of the trie -- du -a
-func (t *Trie) String() {
-	
+func (t *Trie) String() (out string) {
+	out += ""
+	indent := 0
+	t.Root.string(&out, indent)
+	return
 }
 
 // Children returns the set of top-level children for a Node
@@ -209,6 +212,38 @@ func (t *Trie) Mv(from, to string) (*Node, error) {
 }
 
 /* Unexported */
+
+// Make the string representation of a Node
+func (n *Node) string(out *string, indent int) {
+	// Set our key
+	*out += n.Key + "\n"
+	
+	// Set children's keys and call their string()
+	cs := n.Children()
+	for p, v := range cs {
+		lead := ""
+		if p == len(cs)-1 && len(cs) > 1 {
+			lead = "└"
+		} else if indent != 0 {
+			lead = "├"
+		}
+		
+		lead += "─"
+
+		if indent == 0 {
+			*out += "├"
+		} else {
+			*out += "│"
+		}
+		
+		// Indent as needed
+		for i := 0; i < indent; i++ {
+			*out += "   "
+		}
+		*out += lead
+		v.string(out, indent+1)
+	}
+}
 
 // Adds an existing node to the trie -- modifies Key and Next
 func (t *Trie) addNode(keyPath string, n *Node) *Node {
