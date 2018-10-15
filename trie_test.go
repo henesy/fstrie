@@ -135,6 +135,7 @@ func TestString(test *testing.T) {
 	t.Add("/num/c/quote", "polar")
 	t.Add("/num/c/curly", "machine")
 	t.Add("/num/b/king", "sword")
+	t.Add("/abc", 0x321)
 
 	fmt.Println(t.String())
 }

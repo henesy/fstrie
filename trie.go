@@ -222,21 +222,14 @@ func (n *Node) string(out *string, indent int) {
 	cs := n.Children()
 	for p, v := range cs {
 		lead := ""
-		if p == len(cs)-1 && len(cs) > 1 {
+		if p == len(cs)-1 {
 			lead = "└"
-		} else if indent != 0 {
+		} else {
 			lead = "├"
 		}
 		
 		lead += "─"
-
-		if indent == 0 {
-			*out += "├"
-		} else {
-			*out += "│"
-		}
 		
-		// Indent as needed
 		for i := 0; i < indent; i++ {
 			*out += "   "
 		}
