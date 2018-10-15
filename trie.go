@@ -43,7 +43,7 @@ func (t *Trie) Add(keyPath string, data interface{}) *Node {
 	if len(path) < 2 {
 		parentPath = "/"
 	} else {
-		parentPath = mkPath(path[:len(path)-2])
+		parentPath = mkPath(path[:len(path)-1])
 	}
 	p, ok := t.Find(parentPath)
 	if !ok {
@@ -134,6 +134,22 @@ func (t *Trie) Find(keyPath string) (*Node, bool) {
 // Return a string version of the trie -- du -a
 func (t *Trie) String() {
 	
+}
+
+// Return the set of top-level children for a Node
+func (n *Node) Children() []*Node {
+	var children []*Node
+	cursor := n.Down
+	for {
+		if cursor == nil {
+			break
+		}
+		
+		children = append(children, cursor)
+
+		cursor = cursor.Next
+	}
+	return children
 }
 
 // Unexported
