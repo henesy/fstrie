@@ -2,7 +2,6 @@ package fstrie
 
 import (
 	"testing"
-	"fmt"
 )
 
 
@@ -31,8 +30,6 @@ func TestAddMany(test *testing.T) {
 	t.Add("/num/c", c)
 	
 	cs := num.Children()
-	
-	fmt.Println(num)
 	
 	if len(cs) != 3 || cs[0].Key != "c" || cs[1].Key != "b" || cs[2].Key != "a" {
 		test.Errorf("Expected 3 children as a, b, c, got: %v", cs)

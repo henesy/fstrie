@@ -116,8 +116,8 @@ func (t *Trie) Find(keyPath string) (*Node, bool) {
 	cursor := t.Root
 	last := cursor
 
-	for i := 0; i < len(path); i++ {
-		if cursor.Key == key && i == len(path)-1 {
+	for i := 0; i < len(path)+1; i++ {
+		if cursor.Key == key && i == len(path) {
 			// Last element is our file, if exists
 			return cursor, true
 		}
