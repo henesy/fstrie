@@ -46,6 +46,10 @@ Print a string representation of the trie:
 
 	fmt.Println(t.String())
 
+Get the data from a given node (if any):
+
+	fmt.Println(t.Get("/tmp/c"))
+
 ## Demo
 
 The example file `examples/build.go` shows the construction of a basic fstrie and outputs:
