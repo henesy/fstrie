@@ -9,6 +9,7 @@ import (
 	"fmt"
 )
 
+type Walker func(*Node, []string)(interface{})
 
 // Node for trie tree
 type Node struct {
@@ -16,6 +17,7 @@ type Node struct {
 	Data	interface{}
 	Next	*Node
 	Down	*Node
+	Walk	Walker
 }
 
 // Trie tree container
@@ -26,11 +28,7 @@ type Trie struct {
 
 // New creates an initialized Trie
 func New() (t Trie) {
-	n := new(Node)
-	n.Next = nil
-	n.Down = nil
-	n.Data = nil
-	n.Key = "/"
+	n := MkNode("/", nil)
 	t.Root = n
 	return
 }
@@ -56,11 +54,8 @@ func (t *Trie) Add(keyPath string, data interface{}) *Node {
 	}
 	
 	// Insert after p
-	n := new(Node)
+	n := MkNode(key, data)
 	n.Next = p.Down
-	n.Down = nil
-	n.Key = key
-	n.Data = data
 	p.Down = n
 	return n
 }
@@ -138,7 +133,7 @@ func (t *Trie) Get(keyPath string) (interface{}) {
 	path, _ := GetPath(keyPath)
 	// Prepend / to make recursion clean
 	path = append([]string{"/"}, path...)
-	return Walk(t.Root, path)
+	return t.Root.Walk(t.Root, path)
 }
 
 // Perform a walking operation to recursively descend further into the trie (if able)
@@ -160,7 +155,7 @@ func Walk(n *Node, path []string) (interface{}) {
 		path = path[1:]
 		for _, c := range children {
 			if c.Key == path[0] {
-				return Walk(c, path)
+				return n.Walk(c, path)
 			}
 		}
 	}
@@ -341,6 +336,17 @@ func (n *Node) GetChild(key string) *Node {
 		}
 		cursor = cursor.Next
 	}
+}
+
+// Create and initialize a new node with a given key and datum
+func MkNode(key string, data interface{}) *Node {
+	n := new(Node)
+	n.Key = key
+	n.Data = data
+	n.Down = nil
+	n.Next = nil
+	n.Walk = Walk
+	return n
 }
 
 // Utility to extract path and key from keyPath
