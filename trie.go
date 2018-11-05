@@ -41,13 +41,13 @@ func (t *Trie) Add(keyPath string, data interface{}) *Node {
 		// Root is eternal
 		return nil
 	}
-	path, key := getPath(keyPath)
+	path, key := GetPath(keyPath)
 
 	var parentPath string
 	if len(path) < 2 {
 		parentPath = "/"
 	} else {
-		parentPath = mkPath(path[:len(path)-1])
+		parentPath = MkPath(path[:len(path)-1])
 	}
 	p := t.Find(parentPath)
 	if p == nil {
@@ -71,9 +71,9 @@ func (t *Trie) Remove(keyPath string) interface{} {
 		// Not allowed to delete root
 		return nil
 	}
-	path, key := getPath(keyPath)
+	path, key := GetPath(keyPath)
 
-	p, _ := t.getParent(&path, &key)
+	p, _ := t.GetParent(&path, &key)
 	if p == nil {
 		// Parent does not exist, no such file
 		return nil
@@ -108,12 +108,12 @@ func (t *Trie) Remove(keyPath string) interface{} {
 	return nil
 }
 
-// Find a node by string index ;; Returns the found node or nil
+// Find a node by string index via trie-traversal ;; Returns the found node or nil
 func (t *Trie) Find(keyPath string) (*Node) {
 	if keyPath == "/" {
 		return t.Root
 	}
-	path, key := getPath(keyPath)
+	path, key := GetPath(keyPath)
 	if t.Root == nil {
 		return nil
 	}
@@ -124,10 +124,44 @@ func (t *Trie) Find(keyPath string) (*Node) {
 			// Last element is our file, if exists
 			return cursor
 		}
-		cursor = cursor.getChild(path[i])
+		cursor = cursor.GetChild(path[i])
 		if cursor == nil {
 			// There are no more paths to walk
 			break
+		}
+	}
+	return nil
+}
+
+// Find a node's value by asking parent nodes for the child and return the "found" value (virtual get)
+func (t *Trie) Get(keyPath string) (interface{}) {
+	path, _ := GetPath(keyPath)
+	// Prepend / to make recursion clean
+	path = append([]string{"/"}, path...)
+	return Walk(t.Root, path)
+}
+
+// Perform a walking operation to recursively descend further into the trie (if able)
+func Walk(n *Node, path []string) (interface{}) {
+	/* The desired functionality is to replace this method with a handler from the wrapper program */
+	children := n.Children()
+	
+	if len(path) < 1 {
+		// Should never happen
+		return nil
+	} else if len(children) < 1 && len(path) > 1 {
+		// This is a data node, has no children, but looking for a child -- best case to replace Walk() for
+		return nil
+	} else if len(path) == 1 {
+		// The node is us
+		return n.Data
+	} else {
+		// We must recurse further, captain -- strip ourselves out
+		path = path[1:]
+		for _, c := range children {
+			if c.Key == path[0] {
+				return Walk(c, path)
+			}
 		}
 	}
 	return nil
@@ -137,12 +171,12 @@ func (t *Trie) Find(keyPath string) (*Node) {
 func (t *Trie) String() (out string) {
 	out += ""
 	indent := 0
-	t.Root.string(&out, indent)
+	t.Root.String(&out, indent)
 	return
 }
 
 // Children returns the set of top-level children for a node
-func (n *Node) Children() []*Node {
+func (n *Node) Children() [](*Node) {
 	var children []*Node
 	cursor := n.Down
 	for {
@@ -162,7 +196,7 @@ func (t *Trie) Existent(keyPath string) string {
 	if keyPath == "/" {
 		return keyPath
 	}
-	path, _ := getPath(keyPath)
+	path, _ := GetPath(keyPath)
 	if t.Root == nil {
 		return ""
 	}
@@ -170,7 +204,7 @@ func (t *Trie) Existent(keyPath string) string {
 	realPath := ""
 
 	for i := 0; i < len(path); i++ {
-		cursor = cursor.getChild(path[i])
+		cursor = cursor.GetChild(path[i])
 		if cursor == nil {
 			// There are no more paths to walk
 			break
@@ -187,7 +221,7 @@ func (t *Trie) Mv(from, to string) (*Node, error) {
 		return nil, fmt.Errorf("Root is immutable.")
 	}
 
-	tPath, tKey := getPath(to)
+	tPath, tKey := GetPath(to)
 	n := t.Find(from)
 	if n == nil {
 		return nil, fmt.Errorf("Node %v not found.", from)
@@ -198,7 +232,7 @@ func (t *Trie) Mv(from, to string) (*Node, error) {
 	}
 
 	// Maybe this should be its own fn
-	parentPath := mkPath(tPath[:len(tPath)-1])
+	parentPath := MkPath(tPath[:len(tPath)-1])
 	if t.Find(parentPath) == nil {
 		// Parent does not exist
 		return nil, fmt.Errorf("Parent node %v not found.", parentPath)
@@ -206,15 +240,13 @@ func (t *Trie) Mv(from, to string) (*Node, error) {
 	
 	n.Key = tKey
 	t.Remove(from)
-	t.addNode(to, n)
+	t.AddNode(to, n)
 	
 	return n, nil
 }
 
-/* Unexported */
-
 // Build the string representation of a Node
-func (n *Node) string(out *string, indent int) {
+func (n *Node) String(out *string, indent int) {
 	// Set our key
 	*out += n.Key + "\n"
 	
@@ -234,23 +266,23 @@ func (n *Node) string(out *string, indent int) {
 			*out += "│ "
 		}
 		*out += lead
-		v.string(out, indent+1)
+		v.String(out, indent+1)
 	}
 }
 
 // Adds an existing node to the trie -- modifies Key and Next
-func (t *Trie) addNode(keyPath string, n *Node) *Node {
+func (t *Trie) AddNode(keyPath string, n *Node) *Node {
 	if keyPath == "/" {
 		// Root is eternal
 		return nil
 	}
-	path, key := getPath(keyPath)
+	path, key := GetPath(keyPath)
 
 	var parentPath string
 	if len(path) < 2 {
 		parentPath = "/"
 	} else {
-		parentPath = mkPath(path[:len(path)-1])
+		parentPath = MkPath(path[:len(path)-1])
 	}
 	p := t.Find(parentPath)
 	if p == nil {
@@ -269,14 +301,14 @@ func (t *Trie) addNode(keyPath string, n *Node) *Node {
 }
 
 // Walks until it finds the parent of an element ;; Returns {parent, child}
-func (t *Trie) getParent(path *[]string, key *string) (*Node, *Node) {
+func (t *Trie) GetParent(path *[]string, key *string) (*Node, *Node) {
 	var p *Node
 	if len(*path) == 1 {
 		// Base node
 		p = t.Root
 	} else {
 		// Spook
-		parentPath := mkPath((*path)[:len(*path)-1])
+		parentPath := MkPath((*path)[:len(*path)-1])
 		parent := t.Find(parentPath)
 		if parent == nil {
 			// If there's no parent, there's no parent
@@ -285,7 +317,7 @@ func (t *Trie) getParent(path *[]string, key *string) (*Node, *Node) {
 		p = parent
 	}
 
-	c := p.getChild(*key)
+	c := p.GetChild(*key)
 	if c == nil {
 		// If there's no child named key, there's no parent
 		return nil, nil
@@ -295,7 +327,7 @@ func (t *Trie) getParent(path *[]string, key *string) (*Node, *Node) {
 }
 
 // Does a down → (next…) while able and matches a child with Key key
-func (n *Node) getChild(key string) *Node {
+func (n *Node) GetChild(key string) *Node {
 	if n.Down == nil {
 		return nil
 	}
@@ -312,7 +344,7 @@ func (n *Node) getChild(key string) *Node {
 }
 
 // Utility to extract path and key from keyPath
-func getPath(keyPath string) (path []string, key string) {
+func GetPath(keyPath string) (path []string, key string) {
 	// Due to how split works, if we make a path with a leading /, strip 0th
 	path = strings.Split(keyPath, "/")[1:]
 	key = path[len(path)-1]
@@ -320,7 +352,7 @@ func getPath(keyPath string) (path []string, key string) {
 }
 
 // Utility to generate path strings -- slow
-func mkPath(path []string) string {
+func MkPath(path []string) string {
 	keyPath := ""
 	for _, v := range path {
 		keyPath += "/" + v

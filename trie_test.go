@@ -122,6 +122,24 @@ func TestMv(test *testing.T) {
 	}
 }
 
+// Test Get'ing (and Walk'ing)
+func TestGet(test *testing.T) {
+	t := New()
+	t.Add("/tmp", 4)
+	t.Add("/tmp/dir", 8)
+	a, b := 9, 21
+	t.Add("/tmp/dir/a", a)
+	t.Add("/tmp/dir/b", b)
+	
+	aN := t.Get("/tmp/dir/a")
+	bN := t.Get("/tmp/dir/b")
+	cN := t.Get("/tmp/dir/c")
+	
+	if cN != nil || aN != a || bN != b {
+		test.Errorf("Expected to get a, b and not c, got: %v, %v, %v", aN, bN, cN)
+	}
+}
+
 // Test string of tree
 func TestString(test *testing.T) {
 	t := New()
